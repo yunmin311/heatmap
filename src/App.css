@@ -1,0 +1,534 @@
+/* App-level layout only (global styles live in index.css) */
+
+.appShell {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  background:
+    radial-gradient(1200px 900px at 25% 15%, rgba(95, 255, 190, 0.08), transparent 55%),
+    radial-gradient(900px 700px at 75% 65%, rgba(120, 160, 255, 0.07), transparent 55%),
+    #070a10;
+}
+
+.canvasPane {
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(800px 600px at 25% 20%, rgba(120, 160, 255, 0.18), transparent 60%),
+    radial-gradient(700px 560px at 75% 65%, rgba(95, 255, 190, 0.14), transparent 60%),
+    rgba(255, 255, 255, 0.03);
+}
+
+.sidePane {
+  overflow: hidden;
+}
+
+/* frosted glass overlay (iOS-like) */
+.canvasPane::before,
+.sidePane::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(18px) saturate(1.25);
+}
+
+.sidePane::before {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.canvasPane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(900px 700px at 35% 25%, rgba(255, 255, 255, 0.04), transparent 60%);
+  opacity: 0.9;
+}
+
+.sidebar {
+  height: 100%;
+  overflow: auto;
+  padding: 18px 16px 22px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seg {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.segBtn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 7px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.segBtn.active {
+  background: rgba(120, 160, 255, 0.16);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.segBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.titleBlock .title {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.titleBlock .subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.monthNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.monthLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  min-width: 92px;
+  text-align: center;
+}
+
+.panelSection {
+  padding-top: 14px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field .label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.span2 {
+  grid-column: span 2;
+}
+
+.input,
+.textarea {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 10px 10px;
+  outline: none;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: rgba(95, 255, 190, 0.32);
+  box-shadow: 0 0 0 4px rgba(95, 255, 190, 0.08);
+}
+
+.btn {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 9px 10px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn.subtle {
+  background: transparent;
+}
+
+.btn.primary {
+  border-color: rgba(95, 255, 190, 0.22);
+  background: rgba(95, 255, 190, 0.12);
+}
+
+.btn.primary:hover {
+  background: rgba(95, 255, 190, 0.18);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.35;
+  padding: 8px 0 2px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+}
+
+.linkRow {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto;
+  gap: 8px;
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.pill {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+}
+
+.linkTitle {
+  flex: 1;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedMeta {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.selectedMeta .k {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.selectedMeta .v {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.entryList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.entryCard {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px 12px;
+}
+
+.entryTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.time {
+  margin-left: auto;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.entryNote {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.45;
+}
+
+.muted {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(120, 160, 255, 0.1);
+  border: 1px solid rgba(120, 160, 255, 0.18);
+  color: rgba(220, 230, 255, 0.85);
+}
+
+.linkInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.linkA {
+  font-size: 12px;
+  color: rgba(95, 255, 190, 0.92);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(95, 255, 190, 0.18);
+  background: rgba(95, 255, 190, 0.08);
+}
+
+.linkA:hover {
+  background: rgba(95, 255, 190, 0.14);
+}
+
+.panelFooter {
+  padding-top: 14px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footerText {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.canvasStack {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.hudRoot {
+  position: absolute;
+  inset: 14px 14px auto 14px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hudTop {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 18, 28, 0.55);
+  backdrop-filter: blur(10px);
+  width: fit-content;
+}
+
+.hudMonth {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hudRange {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hudAxis {
+  width: min(520px, calc(100vw - 480px));
+}
+
+.hudWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 18, 28, 0.38);
+  backdrop-filter: blur(10px);
+}
+
+.hudW {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hudBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 18, 28, 0.38);
+  backdrop-filter: blur(10px);
+  width: min(640px, calc(100vw - 480px));
+}
+
+.hudLegend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hudLegendLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hudLegendBar {
+  display: flex;
+  gap: 6px;
+}
+
+.hudSwatch {
+  width: 14px;
+  height: 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hudSwatch.i0 {
+  background: rgb(18 22 30);
+}
+.hudSwatch.i1 {
+  background: rgb(40 56 95);
+}
+.hudSwatch.i2 {
+  background: rgb(60 92 170);
+}
+.hudSwatch.i3 {
+  background: rgb(70 150 170);
+}
+.hudSwatch.i4 {
+  background: rgb(85 205 155);
+}
+.hudSwatch.i5 {
+  background: rgb(140 245 170);
+}
+
+.hudSelected {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.viewStub {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(900px 700px at 35% 25%, rgba(120, 160, 255, 0.12), transparent 60%),
+    radial-gradient(700px 600px at 70% 65%, rgba(95, 255, 190, 0.1), transparent 60%),
+    #070a10;
+}
+
+.viewStubTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.viewStubBody {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.viewStubHint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}
+
+@media (max-width: 980px) {
+  .appShell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60vh 40vh;
+  }
+  .canvasPane {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
