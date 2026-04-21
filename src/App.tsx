@@ -56,7 +56,8 @@ function App() {
   }, [entriesByDay])
 
   async function addEntry(input: Omit<LogEntry, 'id' | 'createdAt'>, links?: UiLink[]) {
-    const id = await db.entries.add({ ...input, createdAt: new Date().toISOString() })
+    const createdAt = new Date().toISOString()
+    const id = await db.entries.add({ ...input, createdAt })
     if (links?.length) {
       await db.links.bulkAdd(
         links.map((l) => ({
@@ -68,7 +69,7 @@ function App() {
       )
     }
 
-    const added: LogEntry = { ...input, id, createdAt: new Date().toISOString() }
+    const added: LogEntry = { ...input, id, createdAt }
     setEntriesByDay((prev) => {
       const next = { ...prev }
       const dayList = [added, ...(next[added.day] ?? [])]

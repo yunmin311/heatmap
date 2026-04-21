@@ -78,16 +78,20 @@ export function Sidebar({
     }
   }, [selectedDayEntries])
 
-  async function addLink() {
+async function addLink() {
     const title = linkTitle.trim()
     const target = linkTarget.trim()
     if (!title || !target) return
-    setLinks((prev) => [...prev, { type: target.startsWith('http') ? 'url' : 'file', title, target }])
+    setLinks((prev) => [
+      ...prev,
+      { type: /^https?:\/\//i.test(target) ? 'url' : 'file', title, target },
+    ])
     setLinkTitle('')
     setLinkTarget('')
   }
 
   async function saveEntry() {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return
     const t = tags
       .split(',')
       .map((x) => x.trim())
@@ -107,6 +111,8 @@ export function Sidebar({
       )
       setNote('')
       setLinks([])
+      setLinkTitle('')
+      setLinkTarget('')
     } finally {
       setSaving(false)
     }
@@ -292,8 +298,8 @@ export function Sidebar({
                   <div className="entryNote">{e.note || <span className="muted">No note</span>}</div>
                   {e.tags?.length ? (
                     <div className="tagRow">
-                      {e.tags.map((t) => (
-                        <span key={t} className="tag">
+                      {e.tags.map((t, idx) => (
+                        <span key={`${t}-${idx}`} className="tag">
                           {t}
                         </span>
                       ))}
@@ -332,4 +338,3 @@ export function Sidebar({
     </div>
   )
 }
-
