@@ -1,16 +1,19 @@
 import { format, getDay, startOfMonth, subDays } from 'date-fns'
 import type { HeatCellKey } from '../lib/types'
 
+// HUD（叠加层）组件输入参数。
 type Props = {
   monthAnchor: Date
   selected: HeatCellKey | null
 }
 
+// 周标签（周一到周日）。
 const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 export function HeatmapHud({ monthAnchor, selected }: Props) {
   const start = startOfMonth(monthAnchor)
 
+  // 将 JS 的周日开头转换为周一开头。
   const weekday = (d: Date) => (getDay(d) + 6) % 7
   const gridStart = subDays(start, weekday(start))
   const gridEnd = subDays(gridStart, -(6 * 7 - 1))
@@ -48,4 +51,3 @@ export function HeatmapHud({ monthAnchor, selected }: Props) {
     </div>
   )
 }
-

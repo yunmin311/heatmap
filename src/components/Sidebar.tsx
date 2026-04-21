@@ -4,6 +4,7 @@ import { db } from '../lib/db'
 import type { HeatCellKey, LogEntry, UiLink } from '../lib/types'
 import type { ViewMode } from '../App'
 
+// 侧栏组件输入参数。
 type Props = {
   monthAnchor: Date
   onMonthAnchorChange: (d: Date) => void
@@ -14,10 +15,12 @@ type Props = {
   onViewModeChange: (m: ViewMode) => void
 }
 
+// 月份标题格式化。
 function formatMonth(d: Date) {
   return format(d, 'yyyy MMM')
 }
 
+// 将数字安全裁剪为整数区间。
 function clampInt(n: number, min: number, max: number) {
   const x = Number.isFinite(n) ? n : min
   return Math.max(min, Math.min(max, Math.trunc(x)))
@@ -52,10 +55,12 @@ export function Sidebar({
   const [linksByEntryId, setLinksByEntryId] = useState<Record<number, UiLink[]>>({})
 
   useEffect(() => {
+    // 选中日期变化时，同步表单日期输入。
     if (selected?.day) setDay(selected.day)
   }, [selected?.day])
 
   useEffect(() => {
+    // 读取当前选中日志对应的关联链接。
     let cancelled = false
     ;(async () => {
       const ids = selectedDayEntries.map((e) => e.id).filter((x): x is number => typeof x === 'number')
@@ -78,7 +83,8 @@ export function Sidebar({
     }
   }, [selectedDayEntries])
 
-async function addLink() {
+  async function addLink() {
+    // 暂存待提交的链接项。
     const title = linkTitle.trim()
     const target = linkTarget.trim()
     if (!title || !target) return
@@ -91,6 +97,7 @@ async function addLink() {
   }
 
   async function saveEntry() {
+    // 校验并提交新日志，同时携带链接集合。
     if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return
     const t = tags
       .split(',')
