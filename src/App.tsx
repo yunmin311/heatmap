@@ -8,19 +8,26 @@ import type { HeatCellKey, LogEntry, UiLink } from './lib/types'
 import { seedIfEmpty } from './lib/seed'
 import './App.css'
 
+// 视图模式：目前仅 2.5D 已实现，其它模式预留。
 export type ViewMode = 'calendar-2p5d' | 'voxel-3d' | 'terrain'
 
 function App() {
+  // 月份锚点：决定当前可视范围。
   const [monthAnchor, setMonthAnchor] = useState<Date>(() => startOfMonth(new Date()))
+  // 当前选中的热力格。
   const [selected, setSelected] = useState<HeatCellKey | null>(null)
+  // 按天分组后的日志数据。
   const [entriesByDay, setEntriesByDay] = useState<Record<string, LogEntry[]>>({})
+  // 当前视图模式。
   const [viewMode, setViewMode] = useState<ViewMode>('calendar-2p5d')
 
   useEffect(() => {
+    // 首次进入时，如果数据库为空则写入演示数据。
     void seedIfEmpty()
   }, [])
 
   useEffect(() => {
+    // 启动时读取本地日志并按日期分组。
     let cancelled = false
     ;(async () => {
       const entries = await db.entries.toArray()
@@ -41,11 +48,13 @@ function App() {
   }, [])
 
   const selectedDayEntries = useMemo(() => {
+    // 计算当前选中日期的日志列表。
     if (!selected) return []
     return entriesByDay[selected.day] ?? []
   }, [entriesByDay, selected])
 
   const intensityByDay = useMemo(() => {
+    // 将每天的多条记录聚合为单个强度值，用于热力柱高度。
     const map: Record<string, number> = {}
     for (const [day, list] of Object.entries(entriesByDay)) {
       // 简单聚合：同一天多条记录相加，最大裁剪到 5（后续可做更丰富维度）
@@ -56,6 +65,7 @@ function App() {
   }, [entriesByDay])
 
   async function addEntry(input: Omit<LogEntry, 'id' | 'createdAt'>, links?: UiLink[]) {
+    // 写入日志主表与关联链接，并同步更新内存状态。
     const createdAt = new Date().toISOString()
     const id = await db.entries.add({ ...input, createdAt })
     if (links?.length) {

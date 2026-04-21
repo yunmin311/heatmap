@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { HeatCellKey } from '../lib/types'
 import { Vector3, type Mesh } from 'three'
 
+// 热力图场景组件输入参数。
 type Props = {
   monthAnchor: Date
   intensityByDay: Record<string, number>
@@ -12,6 +13,7 @@ type Props = {
   onSelect: (key: HeatCellKey) => void
 }
 
+// 单个网格单元在场景中的计算结果。
 type Cell = {
   key: HeatCellKey
   x: number
@@ -21,6 +23,7 @@ type Cell = {
   isFuture: boolean
 }
 
+// 点击涟漪动画数据。
 type Ripple = {
   id: string
   origin: [number, number, number]
@@ -28,12 +31,13 @@ type Ripple = {
   strength: number
 }
 
+// 限制到 0~1 区间。
 function clamp01(v: number) {
   return Math.max(0, Math.min(1, v))
 }
 
 function intensityColor(intensity: number) {
-  // 0..5 -> deep indigo -> cyan/green ramp (more dimensional than mono green)
+  // 强度 0..5 对应颜色渐变（深靛蓝到青绿色）。
   const t = clamp01(intensity / 5)
   const stops = [
     { r: 18, g: 22, b: 30 }, // 0
@@ -56,6 +60,7 @@ function intensityColor(intensity: number) {
 }
 
 export function HeatmapScene({ monthAnchor, intensityByDay, selected, onSelect }: Props) {
+  // 当前悬停方块、涟漪效果、点击时间戳等交互状态。
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [ripples, setRipples] = useState<Ripple[]>([])
   const clickT0Ref = useRef<Record<string, number>>({})
@@ -81,12 +86,12 @@ export function HeatmapScene({ monthAnchor, intensityByDay, selected, onSelect }
     const end = endOfMonth(monthAnchor)
     const today0 = startOfDay(new Date())
 
-    // Week starts Monday (1). JS getDay: Sun=0..Sat=6
+    // 周起始按周一计算（JS 默认周日为 0）。
     const weekday = (d: Date) => (getDay(d) + 6) % 7
     const firstWeekday = weekday(start)
     const gridStart = subDays(start, firstWeekday)
 
-    const total = 6 * 7 // fixed 6-week grid for stable layout
+    const total = 6 * 7 // 固定 6 周网格，保证布局稳定。
     const out: Cell[] = []
     for (let i = 0; i < total; i++) {
       const d = subDays(gridStart, -i)
@@ -191,7 +196,7 @@ function SceneContent({
     const now = clock.getElapsedTime()
     if (!baseCamPosRef.current) baseCamPosRef.current = camera.position.clone()
 
-    // --- custom mouse controls
+    // 自定义鼠标控制逻辑。
     const el = gl.domElement
     const rig = cameraRigRef.current
     if (!rig.bound) {
@@ -202,7 +207,7 @@ function SceneContent({
         el.setPointerCapture?.(e.pointerId)
         rig.drag = { button: e.button, x: e.clientX, y: e.clientY }
 
-        // MMB double click to recenter (NOT RMB)
+        // 中键双击复位镜头（不是右键）。
         if (e.button === 1) {
           const t = performance.now()
           const last = rig.lastMMB ?? 0
@@ -228,11 +233,11 @@ function SceneContent({
         rig.drag.y = e.clientY
 
         const scale = rig.distance * 0.0022
-        // LMB: pan only in XZ
+        // 左键：仅在 XZ 平面平移。
         rig.target.x -= dx * scale
         rig.target.z -= dy * scale
 
-        // RMB: pan in XZ + Y (adds “height axis”)
+        // 右键：XZ 平移 + Y 轴高度微调。
         if (rig.drag.button === 2) {
           rig.target.y += dy * scale * 0.8
           rig.target.y = Math.max(-1.2, Math.min(3.5, rig.target.y))
@@ -278,19 +283,19 @@ function SceneContent({
 
   return (
     <>
-      {/* keep canvas transparent; CSS provides frosted background */}
+      {/* 画布保持透明，磨砂背景由 CSS 负责。 */}
 
       <ambientLight intensity={0.85} />
       <directionalLight position={[8, 10, 6]} intensity={0.7} />
 
       <group position={[-3.0, 0, -2.8]} rotation={[0, -0.65, 0]}>
-        {/* base */}
+        {/* 底板 */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.0, -0.08, 2.5]}>
           <planeGeometry args={[14, 12]} />
           <meshStandardMaterial color="#0a0e15" roughness={0.95} metalness={0.02} />
         </mesh>
 
-        {/* in-scene axis labels (inside the view, not only in HUD) */}
+        {/* 场景内坐标标签（不仅在 HUD 中显示） */}
         <group position={[0, 0.02, -0.95]}>
           {weekdayLabels.map((w, i) => (
             <Text
@@ -347,7 +352,7 @@ function SceneContent({
           const color = intensityColor(c.intensity)
           const fade = c.inMonth ? (c.isFuture ? 0.45 : 1) : 0.25
 
-          // click “bounce” (AirPods-like craft: subtle, not cartoony)
+          // 点击回弹：轻微弹性反馈，不做夸张效果。
           const now = performance.now() / 1000
           const dt = clickT0 ? now - clickT0 : 999
           const bounce = dt < 0.55 ? Math.exp(-dt * 10) * Math.sin(dt * 28) : 0
@@ -415,14 +420,14 @@ function SceneContent({
           )
         })}
 
-        {/* ripple shockwaves */}
+        {/* 点击涟漪冲击波 */}
         <Ripples
           ripples={ripples}
           onDone={(id) => onRipplesChange((prev) => prev.filter((r) => r.id !== id))}
         />
       </group>
 
-      {/* custom mouse controls (LMB pan XZ, RMB pan XYZ, MMB double-click reset) */}
+      {/* 自定义鼠标控制：左键平移、右键含高度调节、中键双击复位。 */}
     </>
   )
 }
@@ -463,4 +468,3 @@ function RippleRing({ ripple }: { ripple: Ripple }) {
     </mesh>
   )
 }
-
