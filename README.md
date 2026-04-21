@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Heatmap Vibe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个本地优先（Local-first）的情绪/强度热力图记录项目：  
+用 2.5D 日历网格展示每天的状态，并支持日志条目与链接关联。
 
-Currently, two official plugins are available:
+## 功能概览
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 2.5D 月视图热力格（周一到周日）
+- 支持按天记录日志（intensity / mood / tags / note）
+- 支持给日志挂载链接（URL 或文件路径）
+- 右侧面板查看某天所有日志明细
+- IndexedDB 本地存储（Dexie）
+- 预留 `voxel-3d` / `terrain` 视图模式入口（未实现）
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite 8
+- Three.js + @react-three/fiber + @react-three/drei
+- Dexie (IndexedDB)
+- date-fns
 
-## Expanding the ESLint configuration
+## 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+> 推荐 Node.js 20+。
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+本地访问（默认）：
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+http://localhost:5173
 ```
+
+## 常用命令
+
+```bash
+npm run dev      # 开发
+npm run build    # 构建
+npm run preview  # 预览构建产物
+npm run lint     # 代码检查
+```
+
+## 数据模型
+
+### `entries`（日志主表）
+
+- `id?: number`
+- `day: string`（`yyyy-MM-dd`）
+- `dimension: 'overall'`
+- `intensity: number`（0..5）
+- `mood?: number`（1..5）
+- `tags: string[]`
+- `note: string`
+- `createdAt: string`（ISO）
+
+### `links`（日志关联资源）
+
+- `id?: number`
+- `entryId: number`
+- `type: 'url' | 'file' | 'command'`
+- `title: string`
+- `target: string`
+
+## 交互说明
+
+- 左侧点击某天柱体：选中该日并在右侧显示详情
+- 右侧 `New log`：新增当天日志
+- `Reset DB`：清空本地数据库并刷新（仅开发辅助）
+- 鼠标交互（Canvas）：
+  - 左键拖动：平移
+  - 右键拖动：平移 + 高度方向微调
+  - 中键双击：镜头复位
+  - 滚轮：缩放
+
+## 项目日志（Log）
+
+已新增专业化日志文档：`/PROJECT_LOG.md`  
+用于记录版本变化、修复项、影响范围和风险说明。
+
+## 目前已知情况
+
+- 当前 `lint` 存在部分历史规则问题（主要在 `HeatmapScene.tsx` 的渲染纯度与 `any`），不影响基础构建。
+- 当前 `build` 可通过。
+
+## 后续建议（小步迭代）
+
+- 完成 3D/Terrain 视图渲染分支
+- 给日志表单加入更明确的输入校验提示
+- 增加导出/备份本地日志能力
