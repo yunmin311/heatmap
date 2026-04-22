@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { db } from '../lib/db'
 import type { HeatCellKey, LogEntry, UiLink } from '../lib/types'
 import type { ViewMode } from '../App'
+import { useTheme } from '../theme/ThemeContext'
 
 // 侧栏组件输入参数。
 type Props = {
@@ -35,6 +36,8 @@ export function Sidebar({
   viewMode,
   onViewModeChange,
 }: Props) {
+  const { preset, settings, presets, applyPreset, patchSettings } = useTheme()
+
   const monthRangeText = useMemo(() => {
     const s = startOfMonth(monthAnchor)
     const e = endOfMonth(monthAnchor)
@@ -337,6 +340,94 @@ export function Sidebar({
         ) : (
           <div className="hint">点击左侧热力图的某一天，查看详情。</div>
         )}
+      </div>
+
+      <div className="panelSection">
+        <details className="appearancePanel" open>
+          <summary className="appearanceSummary">外观设置</summary>
+
+          <div className="appearanceBody">
+            <div className="appearancePresets" role="tablist" aria-label="Theme presets">
+              <button
+                type="button"
+                className={`btn presetBtn ${preset === 'deep-space' ? 'primary' : 'subtle'}`}
+                onClick={() => applyPreset('deep-space')}
+              >
+                {presets['deep-space'].label}
+              </button>
+              <button
+                type="button"
+                className={`btn presetBtn ${preset === 'soft-milk' ? 'primary' : 'subtle'}`}
+                onClick={() => applyPreset('soft-milk')}
+              >
+                {presets['soft-milk'].label}
+              </button>
+              <button
+                type="button"
+                className={`btn presetBtn ${preset === 'amber' ? 'primary' : 'subtle'}`}
+                onClick={() => applyPreset('amber')}
+              >
+                {presets.amber.label}
+              </button>
+            </div>
+
+            <label className="field sliderField">
+              <div className="label">背景色</div>
+              <input
+                className="slider"
+                type="range"
+                min={0}
+                max={360}
+                step={1}
+                value={settings.backgroundHue}
+                onChange={(e) => patchSettings({ backgroundHue: Number(e.target.value) })}
+              />
+              <div className="sliderValue mono">{Math.round(settings.backgroundHue)}°</div>
+            </label>
+
+            <label className="field sliderField">
+              <div className="label">毛玻璃透明度</div>
+              <input
+                className="slider"
+                type="range"
+                min={0.03}
+                max={0.75}
+                step={0.01}
+                value={settings.glassOpacity}
+                onChange={(e) => patchSettings({ glassOpacity: Number(e.target.value) })}
+              />
+              <div className="sliderValue mono">{settings.glassOpacity.toFixed(2)}</div>
+            </label>
+
+            <label className="field sliderField">
+              <div className="label">模糊强度</div>
+              <input
+                className="slider"
+                type="range"
+                min={8}
+                max={36}
+                step={1}
+                value={settings.blurStrength}
+                onChange={(e) => patchSettings({ blurStrength: Number(e.target.value) })}
+              />
+              <div className="sliderValue mono">{Math.round(settings.blurStrength)}px</div>
+            </label>
+
+            <label className="field sliderField">
+              <div className="label">流体纹理透明度</div>
+              <input
+                className="slider"
+                type="range"
+                min={0.06}
+                max={0.12}
+                step={0.01}
+                value={settings.fluidOpacity}
+                onChange={(e) => patchSettings({ fluidOpacity: Number(e.target.value) })}
+              />
+              <div className="sliderValue mono">{settings.fluidOpacity.toFixed(2)}</div>
+            </label>
+          </div>
+        </details>
       </div>
 
       <div className="panelFooter">

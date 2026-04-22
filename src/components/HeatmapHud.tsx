@@ -5,12 +5,21 @@ import type { HeatCellKey } from '../lib/types'
 type Props = {
   monthAnchor: Date
   selected: HeatCellKey | null
+  onFocusOverview: () => void
+  onFocusWeekday: (weekday: number) => void
+  onFocusSelectedDay: (day: string) => void
 }
 
 // 周标签（周一到周日）。
 const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-export function HeatmapHud({ monthAnchor, selected }: Props) {
+export function HeatmapHud({
+  monthAnchor,
+  selected,
+  onFocusOverview,
+  onFocusWeekday,
+  onFocusSelectedDay,
+}: Props) {
   const start = startOfMonth(monthAnchor)
 
   // 将 JS 的周日开头转换为周一开头。
@@ -19,20 +28,20 @@ export function HeatmapHud({ monthAnchor, selected }: Props) {
   const gridEnd = subDays(gridStart, -(6 * 7 - 1))
 
   return (
-    <div className="hudRoot" aria-hidden="true">
-      <div className="hudTop">
+    <div className="hudRoot">
+      <button className="hudTop hudClick" type="button" onClick={onFocusOverview}>
         <div className="hudMonth">{format(monthAnchor, 'yyyy MMM')}</div>
         <div className="hudRange mono">
           {format(gridStart, 'yyyy-MM-dd')} → {format(gridEnd, 'yyyy-MM-dd')}
         </div>
-      </div>
+      </button>
 
       <div className="hudAxis">
         <div className="hudWeekdays">
-          {weekdayLabels.map((d) => (
-            <div key={d} className="hudW">
+          {weekdayLabels.map((d, idx) => (
+            <button key={d} className="hudW hudClick" type="button" onClick={() => onFocusWeekday(idx)}>
               {d}
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -46,7 +55,16 @@ export function HeatmapHud({ monthAnchor, selected }: Props) {
             ))}
           </div>
         </div>
-        <div className="hudSelected mono">{selected?.day ? `Selected: ${selected.day}` : `In month: ${format(start, 'yyyy-MM')} (${format(start, 'MM')})`}</div>
+        <button
+          className="hudSelected mono hudClick"
+          type="button"
+          onClick={() => {
+            if (selected?.day) onFocusSelectedDay(selected.day)
+            else onFocusOverview()
+          }}
+        >
+          {selected?.day ? `Selected: ${selected.day}` : `In month: ${format(start, 'yyyy-MM')} (${format(start, 'MM')})`}
+        </button>
       </div>
     </div>
   )

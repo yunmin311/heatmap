@@ -6,12 +6,19 @@ import { Sidebar } from './components/Sidebar'
 import { db } from './lib/db'
 import type { HeatCellKey, LogEntry, UiLink } from './lib/types'
 import { seedIfEmpty } from './lib/seed'
+import { useTheme } from './theme/ThemeContext'
 import './App.css'
 
 // 视图模式：目前仅 2.5D 已实现，其它模式预留。
 export type ViewMode = 'calendar-2p5d' | 'voxel-3d' | 'terrain'
 
+export type CameraCommand =
+  | { id: number; type: 'overview' }
+  | { id: number; type: 'weekday'; weekday: number }
+  | { id: number; type: 'day'; day: string }
+
 function App() {
+  const { cssVars } = useTheme()
   // 月份锚点：决定当前可视范围。
   const [monthAnchor, setMonthAnchor] = useState<Date>(() => startOfMonth(new Date()))
   // 当前选中的热力格。
@@ -20,6 +27,8 @@ function App() {
   const [entriesByDay, setEntriesByDay] = useState<Record<string, LogEntry[]>>({})
   // 当前视图模式。
   const [viewMode, setViewMode] = useState<ViewMode>('calendar-2p5d')
+  // 场景镜头指令（由 HUD 点击触发）。
+  const [cameraCommand, setCameraCommand] = useState<CameraCommand | null>(null)
 
   useEffect(() => {
     // 首次进入时，如果数据库为空则写入演示数据。
@@ -88,8 +97,21 @@ function App() {
     })
   }
 
+  function focusOverview() {
+    setCameraCommand({ id: Date.now(), type: 'overview' })
+  }
+
+  function focusWeekday(weekday: number) {
+    setCameraCommand({ id: Date.now(), type: 'weekday', weekday })
+  }
+
+  function focusSelectedDay(day: string) {
+    setCameraCommand({ id: Date.now(), type: 'day', day })
+    setSelected({ day, dimension: 'overall' })
+  }
+
   return (
-    <div className="appShell">
+    <div className="appShell" style={cssVars}>
       <div className="canvasPane" role="application" aria-label="Heatmap canvas">
         <div className="canvasStack">
           {viewMode === 'calendar-2p5d' ? (
@@ -98,6 +120,7 @@ function App() {
               intensityByDay={intensityByDay}
               selected={selected}
               onSelect={setSelected}
+              cameraCommand={cameraCommand}
             />
           ) : (
             <div className="viewStub">
@@ -106,7 +129,13 @@ function App() {
               <div className="viewStubHint">先把接口开放出来：后续我们会接上 3D / 地形视角。</div>
             </div>
           )}
-          <HeatmapHud monthAnchor={monthAnchor} selected={selected} />
+          <HeatmapHud
+            monthAnchor={monthAnchor}
+            selected={selected}
+            onFocusOverview={focusOverview}
+            onFocusWeekday={focusWeekday}
+            onFocusSelectedDay={focusSelectedDay}
+          />
         </div>
       </div>
       <div className="sidePane" role="complementary" aria-label="Details panel">
